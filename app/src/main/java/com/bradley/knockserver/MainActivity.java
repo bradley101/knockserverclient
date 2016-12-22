@@ -45,8 +45,9 @@ public class MainActivity extends AppCompatActivity {
         pd.setMessage("Waiting for a client");
         //pd.show();
 
-        new Thread(new InputThread()).start();
-        new Thread(new OutputThread()).start();
+        //new Thread(new InputThread()).start();
+        //new Thread(new OutputThread()).start();
+
     }
 
     class InputThread implements Runnable {
