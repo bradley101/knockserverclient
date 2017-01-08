@@ -66,7 +66,7 @@ public class DriverActivity extends AppCompatActivity {
     }
 
     private void stream(String name) {
-        ParentFunctionalty func = new ParentFunctionalty(this, messageContainer, et, btn, name);
+        ParentFunctionality func = new ParentFunctionality(this, messageContainer, et, btn, name);
         func.performFunction();
     }
 

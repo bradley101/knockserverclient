@@ -5,6 +5,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -58,15 +59,21 @@ public class ConnectFunctionality {
             @Override
             public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
                 LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                View v = inflater.inflate(R.layout.chat_message_bubble_layout, parent);
-                RelativeLayout rl = (RelativeLayout) v.findViewById(R.id.chat_bubble_rl);
-                RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) rl.getLayoutParams();
-                params.addRule(messagesAlignment.get(position));
-                TextView tv = (TextView) v.findViewById(R.id.chat_message);
+                if (convertView == null) {
+                    convertView = inflater.inflate(R.layout.chat_message_bubble_layout, parent);
+                }
+                TextView tv = (TextView) convertView.findViewById(R.id.chat_message);
                 tv.setText(messagesText.get(position));
-                return v;
+                ((RelativeLayout) convertView.findViewById(R.id.chat_bubble_rl)).setHorizontalGravity(messagesAlignment.get(position));
+                return convertView;
+            }
+
+            @Override
+            public int getCount() {
+                return messagesText.size();
             }
         };
+        myListView.setAdapter(myListViewArrayAdapter);
         new Thread(new ConnectToServer()).start();
     }
 
@@ -91,7 +98,7 @@ public class ConnectFunctionality {
                                 context.runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        updateUI(s, RelativeLayout.ALIGN_PARENT_LEFT);
+                                        updateUI(s, Gravity.LEFT);
                                     }
                                 });
                             }
@@ -110,10 +117,10 @@ public class ConnectFunctionality {
                                 mySendButton.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View view) {
-                                        String s = "\n" + name + "-> " + myEditText.getText().toString();
+                                        String s = name + "-> " + myEditText.getText().toString();
                                         log (s);
                                         out.println(s);
-                                        updateUI(s, RelativeLayout.ALIGN_PARENT_RIGHT);
+                                        updateUI(s, Gravity.RIGHT);
                                     }
                                 });
                             }

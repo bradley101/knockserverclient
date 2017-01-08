@@ -5,6 +5,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -68,13 +69,19 @@ public class ParentFunctionality {
             @Override
             public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
                 LayoutInflater inflater = (LayoutInflater) parentActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                View v = inflater.inflate(R.layout.chat_message_bubble_layout, parent);
-                RelativeLayout rl = (RelativeLayout) v.findViewById(R.id.chat_bubble_rl);
-                RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) rl.getLayoutParams();
-                params.addRule(messagesAlignment.get(position));
-                TextView tv = (TextView) v.findViewById(R.id.chat_message);
+                if (convertView == null) {
+                    convertView = inflater.inflate(R.layout.chat_message_bubble_layout, parent, false);
+                }
+                TextView tv = (TextView) convertView.findViewById(R.id.chat_message);
                 tv.setText(messagesText.get(position));
-                return v;
+                RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) tv.getLayoutParams();
+                params.addRule(messagesAlignment.get(position));
+                return convertView;
+            }
+
+            @Override
+            public int getCount() {
+                return messagesText.size();
             }
         };
 
