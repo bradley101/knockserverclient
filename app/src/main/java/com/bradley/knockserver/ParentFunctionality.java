@@ -1,9 +1,18 @@
 package com.bradley.knockserver;
 
 import android.app.Activity;
+import android.content.Context;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.io.BufferedReader;
@@ -14,35 +23,68 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 
+
 /**
  * Created by bradley on 22-12-2016.
  */
-class ParentFunctionalty {
+
+
+public class ParentFunctionality {
+    final String TAG = "KNOCKKNOCK";
     ArrayList<Socket> openSockets;
     ArrayList<BufferedReader> openReaders;
     ArrayList<PrintWriter> openWriters;
-    TextView serverTextView;
+    ListView serverListView;
     EditText serverEditText;
     Button serverSendbutton;
     Activity parentActivity;
+    String name;
+    ArrayList<String> messagesText;
+    ArrayList<Integer> messagesAlignment;
+    ArrayAdapter<String> messagesListViewAdapter;
 
-    public ParentFunctionalty(Activity context, TextView tv, EditText et, Button btn) {
+    void log (String s) {
+        Log.i (TAG, s);
+    }
+
+    public ParentFunctionality(Activity context, ListView lv, EditText et, Button btn, String name) {
         openSockets = new ArrayList<>();
         openReaders = new ArrayList<>();
         openWriters = new ArrayList<>();
+        messagesText = new ArrayList<>();
+        messagesAlignment = new ArrayList<>();
 
         this.parentActivity = context;
-        this.serverTextView = tv;
+        this.serverListView = lv;
         this.serverEditText = et;
         this.serverSendbutton = btn;
+        this.name = name;
     }
 
-    public void performFunction()  {
+    public void performFunction() {
+
+        messagesListViewAdapter = new ArrayAdapter<String>(parentActivity, R.layout.chat_message_bubble_layout) {
+            @NonNull
+            @Override
+            public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+                LayoutInflater inflater = (LayoutInflater) parentActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                View v = inflater.inflate(R.layout.chat_message_bubble_layout, parent);
+                RelativeLayout rl = (RelativeLayout) v.findViewById(R.id.chat_bubble_rl);
+                RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) rl.getLayoutParams();
+                params.addRule(messagesAlignment.get(position));
+                TextView tv = (TextView) v.findViewById(R.id.chat_message);
+                tv.setText(messagesText.get(position));
+                return v;
+            }
+        };
+
+        serverListView.setAdapter(messagesListViewAdapter);
+
         new Thread(new GroupIO()).start();
         new Thread(new PerformOutput()).start();
     }
 
-    public class PerformOutput implements Runnable {
+    class PerformOutput implements Runnable {
 
         @Override
         public void run() {
@@ -56,12 +98,16 @@ class ParentFunctionalty {
                             s = serverEditText.getText().toString();
 
                             // append my name as the sender
-                            s = "Shantanu-> " + s;
+                            s = "\n" + name + "-> " + s;
+
+                            updateUI(s, RelativeLayout.ALIGN_PARENT_RIGHT);
 
                             // send string to every client
                             for (PrintWriter o : openWriters) {
                                 o.println(s);
                             }
+
+                            log (s);
                         }
                     });
                 }
@@ -125,21 +171,26 @@ class ParentFunctionalty {
                         }
 
                         // TODO Update server UI with the incoming message
-                        updateUI(s);
+                        updateUI(s, RelativeLayout.ALIGN_PARENT_LEFT);
+
+                        log(s);
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
         }
-
-        public void updateUI(final String s) {
-            parentActivity.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    serverTextView.append("\n" + s);
-                }
-            });
-        }
     }
+
+    public void updateUI(final String s, final int align) {
+        parentActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                messagesText.add(s);
+                messagesAlignment.add(align);
+                messagesListViewAdapter.notifyDataSetChanged();
+            }
+        });
+    }
+
 }

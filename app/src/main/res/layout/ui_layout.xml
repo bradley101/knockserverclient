@@ -1,32 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_margin="10sp"
-    android:orientation="vertical" android:layout_width="match_parent" android:layout_height="match_parent">
+<RelativeLayout android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="10sp"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <TextView
+        <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_weight="18"
-        android:id="@+id/display_ui"
-        android:layout_height="0sp" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_weight="2"
-        android:orientation="horizontal"
-        android:layout_height="0sp">
-
-        <EditText
-            android:layout_width="0sp"
-            android:layout_weight="7"
-            android:hint="Enter message"
-            android:id="@+id/message"
-            android:layout_height="wrap_content" />
+        android:id="@+id/messaage_layout"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true">
 
         <Button
-            android:layout_width="0sp"
-            android:text="SEND"
-            android:id="@+id/send_button"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="3"/>
-    </LinearLayout>
-</LinearLayout>
+            android:layout_alignParentRight="true"
+            android:text="SEND"
+            android:id="@+id/send_button" />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toLeftOf="@id/send_button"
+            android:id="@+id/message"
+            android:layout_alignTop="@id/send_button" />
+    </RelativeLayout>
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_above="@id/messaage_layout"
+        android:transcriptMode="alwaysScroll"
+        android:stackFromBottom="true"
+        android:id="@+id/message_container"
+        android:layout_height="match_parent" />
+
+
+</RelativeLayout>
